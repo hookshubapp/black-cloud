@@ -1,0 +1,22 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - nvm install 22 && nvm use 22
+        - corepack enable
+        - pnpm install
+    build:
+      commands:
+        # Amplify only exposes environment variables to the server at runtime
+        # if they are written to .env.production during the build.
+        - env | grep -E '^(INQUIRY_|SES_REGION|NEXT_PUBLIC_)' >> .env.production || true
+        - pnpm run build
+  artifacts:
+    baseDirectory: .next
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - .next/cache/**/*
+      - node_modules/**/*
